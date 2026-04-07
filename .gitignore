@@ -6,12 +6,16 @@ __pycache__/
 
 # Virtual environment
 venv/
+.venv/
 
 # IDE
 .idea/
 .vscode/
 .DS_Store
 __MACOSX/
+
+# Local tooling
+.tools/
 
 # Static resources
 resources/fonts/
@@ -21,6 +25,8 @@ config.py
 
 # Outputs
 output/
+build/
+esp32/**/build/
 
 # Database
 filelist.txt
