@@ -1,0 +1,3 @@
+board_manager:
+  additional_urls:
+    - https://jihulab.com/esp-mirror/espressif/arduino-esp32/-/raw/gh-pages/package_esp32_index_cn.json

@@ -406,8 +406,12 @@ void handleSave() {
 // =======================
 void prepareDeepSleepDomains() {
   esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH,    ESP_PD_OPTION_OFF);
+#if defined(SOC_PM_SUPPORT_RTC_SLOW_MEM_PD) && SOC_PM_SUPPORT_RTC_SLOW_MEM_PD
   esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_SLOW_MEM,  ESP_PD_OPTION_OFF);
+#endif
+#if defined(SOC_PM_SUPPORT_RTC_FAST_MEM_PD) && SOC_PM_SUPPORT_RTC_FAST_MEM_PD
   esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_FAST_MEM,  ESP_PD_OPTION_OFF);
+#endif
 }
 
 // =======================
@@ -526,7 +530,7 @@ void startConfigPortal() {
 // =======================
 //  WiFi 连接
 // =======================
-bool connectWiFi(const Config &cfg, uint32_t timeout_ms = 15000) {
+bool connectWiFi(const Config &cfg, uint32_t timeout_ms = 25000) {
 #if DEBUG_LOG
   DBG_PRINTLN("[WIFI] connectWiFi()");
   DBG_PRINT("[WIFI] target ssid="); DBG_PRINTLN(cfg.wifi_ssid);
@@ -534,36 +538,48 @@ bool connectWiFi(const Config &cfg, uint32_t timeout_ms = 15000) {
 
   if (cfg.wifi_ssid.isEmpty()) return false;
 
-  WiFi.disconnect(true, true);
-  WiFi.mode(WIFI_STA);
+  const int maxAttempts = 3;
+  for (int attempt = 1; attempt <= maxAttempts; ++attempt) {
+    WiFi.disconnect(true, true);
+    delay(300);
+    WiFi.mode(WIFI_STA);
+    WiFi.setAutoReconnect(true);
+    WiFi.setSleep(false);
+    WiFi.setTxPower(WIFI_POWER_19_5dBm);
 
-  WiFi.setSleep(true);
-  WiFi.setTxPower(WIFI_POWER_8_5dBm);
-  WiFi.begin(cfg.wifi_ssid.c_str(), cfg.wifi_pass.c_str());
-
-  uint32_t start = millis();
-  while (WiFi.status() != WL_CONNECTED && millis() - start < timeout_ms) {
-    delay(200);
 #if DEBUG_LOG
-    DBG_PRINT(".");
+    DBG_PRINT("[WIFI] attempt "); DBG_PRINT(attempt);
+    DBG_PRINT("/"); DBG_PRINTLN(maxAttempts);
+#endif
+
+    WiFi.begin(cfg.wifi_ssid.c_str(), cfg.wifi_pass.c_str());
+
+    uint32_t start = millis();
+    while (WiFi.status() != WL_CONNECTED && millis() - start < timeout_ms) {
+      delay(200);
+#if DEBUG_LOG
+      DBG_PRINT(".");
+#endif
+    }
+#if DEBUG_LOG
+    DBG_PRINTLN();
+#endif
+
+    if (WiFi.status() == WL_CONNECTED) {
+#if DEBUG_LOG
+      DBG_PRINTLN("[WIFI] connected");
+      DBG_PRINT("[WIFI] IP="); DBG_PRINTLN(WiFi.localIP());
+#endif
+      return true;
+    }
+
+#if DEBUG_LOG
+    DBG_PRINT("[WIFI] connect FAILED, status=");
+    DBG_PRINTLN((int)WiFi.status());
 #endif
   }
-#if DEBUG_LOG
-  DBG_PRINTLN();
-#endif
 
-  bool ok = (WiFi.status() == WL_CONNECTED);
-
-#if DEBUG_LOG
-  if (ok) {
-    DBG_PRINTLN("[WIFI] connected");
-    DBG_PRINT("[WIFI] IP="); DBG_PRINTLN(WiFi.localIP());
-  } else {
-    DBG_PRINTLN("[WIFI] connect FAILED");
-  }
-#endif
-
-  return ok;
+  return false;
 }
 
 // =======================
