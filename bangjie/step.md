@@ -1,0 +1,3 @@
+- 模型：step-3.5-flash
+- base_url 是 https://api.stepfun.com/v1
+- 秘钥  2zJIWoIOqbci07cCLxm7pXB5OcE22BgdtNtiO5IUi2n2EHAx6CamyGqGV71Rq4fmu

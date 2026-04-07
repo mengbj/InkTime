@@ -1,0 +1,12 @@
+- 相关的开源项目   
+	- 背景信息
+		- 7.3寸四色墨水屏（长排线） 支持b站大佬的AI开源项目 短排线的没有了，现在只有长排线的，数量有限，看好下手 使用Arduino 安装gxepd2库，可以直接驱动 支持Arduino的开发板支持都可以驱动 与微雪7.3四色屏同款 黑白黄红四色 最后图示为使用本店esp32核心板驱动的说明
+		- 对应的屏幕相关
+			- 墨水屏
+		- 另外有esp32的开发板
+	- 仔细阅读项目 https://github.com/dai-hongtao/InkTime
+	- 已经fork下来 git@github.com:mengbj/InkTime.git
+	- 要求
+		- 点亮墨水屏   当前重点
+		- 把项目run起来
+		- 完成后记录到目录/Users/apple/bangjie/dev_jy/InkTime/bangjie 下的新文档中  文档命名规则： 年-月-日-时分-提炼的主题.md
